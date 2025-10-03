@@ -105,7 +105,7 @@ const fetchTransactionDetails = async (transaction_id) => {
     }
 };
 
-const createTransaction = async (slots) => {
+const createTransaction = async (slots, images) => {
     try {
         const [storedMachine, storedUserId] = await Promise.all([
             AsyncStorage.getItem('machine_id'),
@@ -128,11 +128,19 @@ const createTransaction = async (slots) => {
             }]
         ));
 
+        const transactionImages = images.map(item => (
+            [0, 0, {
+                file_name: item.fileName,
+                image: item.base64
+            }]
+        ));
+
         const paramTransaction = {
             machine_id: machine.id,
             user_id: userId,
             date: new Date().toISOString().slice(0, 19).replace('T', ' '),
             detail_ids: transactionLines,
+            image_ids: transactionImages,
         };
 
         const response = await odoo.create('sea.vending.machine.transaction', paramTransaction, {});
